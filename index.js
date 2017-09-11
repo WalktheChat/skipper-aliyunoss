@@ -44,15 +44,15 @@ module.exports = function SkipperS3(globalOpts) {
       co(store.getStream(prefix))
         .then(function (getStreamResult) {
           // check whether we got an actual file stream:
-          if (getStreamResult.status < 300) {
+          if (getStreamResult.res.status < 300) {
             getStreamResult.stream.once('error', function (err) {
               __transform__.emit('error', err);
             });
             getStreamResult.stream.pipe(__transform__);
           } else {
             var err = new Error();
-            err.status = getStreamResult.status;
-            err.headers = getStreamResult.headers;
+            err.status = getStreamResult.res.status;
+            err.headers = getStreamResult.res.headers;
             err.message = 'Non-200 status code returned from Aliyun for requested file.';
             __transform__.emit('error', err);
           }
@@ -114,7 +114,13 @@ module.exports = function SkipperS3(globalOpts) {
 
       co(store.list({prefix: prefix}))
         .then(function (result) {
-          cb(null, result.objects);
+          if (result && result.objects) {
+            cb(null, result.objects.map(function (object) {
+              return object.name;
+            }));
+          } else {
+            cb(null, []);
+          }
         })
         .catch(function (err) {
           cb(err, null);
@@ -139,6 +145,7 @@ module.exports = function SkipperS3(globalOpts) {
   function AliyunReceiver(options) {
     options = options || {};
     options = _.defaults(options, globalOpts);
+    var headers = options.headers || {};
 
     var receiver__ = Writable({
       objectMode: true
@@ -149,9 +156,12 @@ module.exports = function SkipperS3(globalOpts) {
         accessKeyId: options.key,
         accessKeySecret: options.secret,
         bucket: options.bucket,
-        region: globalOpts.region || 'oss-cn-qingdao'
+        region: globalOpts.region || undefined
       });
-      co(store.putStream(__newFile.fd, __newFile))
+
+      var mimeType = headers['content-type'] || mime.lookup(__newFile.fd);
+
+      co(store.putStream(__newFile.fd, __newFile, {mime: mimeType}))
         .then(function (result) {
           return co(store.head(__newFile.fd));
         })
@@ -176,5 +186,3 @@ module.exports = function SkipperS3(globalOpts) {
     return receiver__;
   }
 };
-
-
