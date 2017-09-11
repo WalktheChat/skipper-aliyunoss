@@ -20,7 +20,7 @@
     "sails",
     "express"
   ],
-  "author": " Mike McNeil // Qiong Wu",
+  "author": "Mike McNeil // Qiong Wu",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/WalktheChat/skipper-aliyunoss/issues"
@@ -36,7 +36,7 @@
     "fs-extra": "0.30.0",
     "lodash": "3.10.1",
     "merge-defaults": "0.1.4",
-    "mime": "1.2.11",
+    "mime": "1.2.11"
   },
   "optionalDependencies": {
     "travis-encrypt": "^2.1.1"
