@@ -1,5 +1,5 @@
 {
-  "name": "skipper-aliyunoss",
+  "name": "@walkthechat/skipper-aliyunoss",
   "version": "0.1.0",
   "description": "Streaming file uploads to Aliyun OSS",
   "main": "index.js",
