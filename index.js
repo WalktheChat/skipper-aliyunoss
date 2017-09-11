@@ -160,7 +160,9 @@ module.exports = function SkipperS3(globalOpts) {
 
       co(store.putStream(__newFile.fd, __newFile, {mime: mimeType}))
         .then(function (result) {
-          return co(store.head(__newFile.fd));
+          __newFile.filename = __newFile.fd;
+          __newFile.fd = result.url;
+          return co(store.head(__newFile.filename));
         })
         .then(function (result) {
           __newFile.extra = result.res.headers;
