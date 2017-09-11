@@ -151,14 +151,13 @@ module.exports = function SkipperS3(globalOpts) {
         bucket: options.bucket,
         region: globalOpts.region || 'oss-cn-qingdao'
       });
-      console.log(JSON.stringify(__newFile.fd));
       co(store.putStream(__newFile.fd, __newFile))
         .then(function (result) {
-          __newFile.extra = result;
+          return co(store.head(__newFile.fd));
         })
-        .then(co(store.head(__newFile.fd)))
-        .then(function(result){
-          console.log(result);
+        .then(function (result) {
+          __newFile.extra = result.res.headers;
+          __newFile.byteCount = result.res.headers["content-length"];
           receiver__.emit('writefile', __newFile);
           next();
         })
