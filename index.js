@@ -13,9 +13,10 @@ var knox = require('knox');
 var S3MultipartUpload = require('knox-mpu-alt');
 var S3Lister = require('s3-lister');
 var mime = require('mime');
+var co = require('co');
 
 /**
- * skipper-s3
+ * skipper-aliyunoss
  *
  * @param  {Object} globalOpts
  * @return {Object}
@@ -24,14 +25,9 @@ var mime = require('mime');
 module.exports = function SkipperS3(globalOpts) {
   globalOpts = globalOpts || {};
 
-  // console.log('S3 adapter was instantiated...');
-
   var adapter = {
-
     read: function (fd, cb) {
-
       var prefix = fd;
-
       var store = oss({
         accessKeyId: globalOpts.key,
         accessKeySecret: globalOpts.secret,
@@ -45,23 +41,25 @@ module.exports = function SkipperS3(globalOpts) {
         return callback(null, chunk);
       };
 
-      var getStreamResult = yield store.getStream(prefix);
-
-      // Handle explicit s3res errors
-
-      // check whether we got an actual file stream:
-      if (getStreamResult.status < 300) {
-        getStreamResult.stream.once('error', function (err) {
+      co(store.getStream(prefix))
+        .then(function (getStreamResult) {
+          // check whether we got an actual file stream:
+          if (getStreamResult.status < 300) {
+            getStreamResult.stream.once('error', function (err) {
+              __transform__.emit('error', err);
+            });
+            getStreamResult.stream.pipe(__transform__);
+          } else {
+            var err = new Error();
+            err.status = getStreamResult.status;
+            err.headers = getStreamResult.headers;
+            err.message = 'Non-200 status code returned from Aliyun for requested file.';
+            __transform__.emit('error', err);
+          }
+        })
+        .catch(function (err) {
           __transform__.emit('error', err);
         });
-        getStreamResult.stream.pipe(__transform__);
-      } else {
-        var err = new Error();
-        err.status = getStreamResult.status;
-        err.headers = getStreamResult.headers;
-        err.message = 'Non-200 status code returned from Aliyun for requested file.';
-        __transform__.emit('error', err);
-      }
 
       if (cb) {
         var firedCb;
@@ -88,16 +86,20 @@ module.exports = function SkipperS3(globalOpts) {
         region: globalOpts.region || undefined
       });
 
-      var result = yield store.delete(fd);
-
-      if (result.status == 200) {
-        cb();
-      } else {
-        cb({
-          statusCode: result.status,
-          message: result
+      co(store.delete(fd))
+        .then(function (result) {
+          if (result.status == 200) {
+            cb();
+          } else {
+            cb({
+              statusCode: result.status,
+              message: result
+            });
+          }
+        })
+        .catch(function (err) {
+          cb(err);
         });
-      }
     },
     ls: function (dirname, cb) {
       var store = oss({
@@ -110,14 +112,13 @@ module.exports = function SkipperS3(globalOpts) {
       // Strip leading slash from dirname to form prefix
       var prefix = dirname.replace(/^\//, '');
 
-      try {
-        var listResult = yield store.list({
-          prefix: prefix
+      co(store.list({prefix: prefix}))
+        .then(function (result) {
+          cb(null, result.objects);
+        })
+        .catch(function (err) {
+          cb(err, null);
         });
-        cb(null, listResult.objects);
-      } catch (err) {
-        cb(err, null);
-      }
     },
 
     receive: AliyunReceiver
@@ -148,20 +149,26 @@ module.exports = function SkipperS3(globalOpts) {
         accessKeyId: options.key,
         accessKeySecret: options.secret,
         bucket: options.bucket,
-        region: globalOpts.region || undefined
+        region: globalOpts.region || 'oss-cn-qingdao'
       });
-      try {
-        var object = yield store.putStream(__newFile.fd, __newFile);
-        next();
-      } catch (err) {
-        return next({
-          incoming: __newFile,
-          code: 'E_WRITE',
-          stack: typeof err === 'object' ? err.stack : new Error(err),
-          name: typeof err === 'object' ? err.name : err,
-          message: typeof err === 'object' ? err.message : err
+      console.log(JSON.stringify(__newFile.fd));
+      co(store.putStream(__newFile.fd, __newFile))
+        .then(function (result) {
+          __newFile.extra = result;
+          __newFile.byteCount = result.size;
+          receiver__.emit('writefile', __newFile);
+          next();
+        })
+        .catch(function (err) {
+          return next({
+            incoming: __newFile,
+            code: 'E_WRITE',
+            stack: typeof err === 'object' ? err.stack : new Error(err),
+            name: typeof err === 'object' ? err.name : err,
+            message: typeof err === 'object' ? err.message : err
+          });
         });
-      }
+
     };
 
     return receiver__;
