@@ -1,17 +1,18 @@
 {
-  "name": "skipper-s3",
+  "name": "skipper-aliyunoss",
   "version": "0.5.9",
-  "description": "Streaming file uploads to S3",
+  "description": "Streaming file uploads to Aliyun OSS",
   "main": "index.js",
   "scripts": {
     "test": "node -e \"require('skipper-adapter-tests')({mocha: { timeout: 360000 }, module: require('./'), bucket:process.env.BUCKET || 'skipper-adapter-tests', key: process.env.KEY, secret: process.env.SECRET});\""
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/balderdashy/skipper-s3.git"
+    "url": "git://github.com/WalktheChat/skipper-aliyunoss.git"
   },
   "keywords": [
-    "s3",
+    "aliyun",
+    "aliyun-oss",
     "streaming-file-upload",
     "streaming",
     "file",
@@ -22,13 +23,16 @@
   "author": "Mike McNeil",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/balderdashy/skipper-s3/issues"
+    "url": "https://github.com/WalktheChat/skipper-aliyunoss/issues"
   },
-  "homepage": "https://github.com/balderdashy/skipper-s3",
+  "homepage": "https://github.com/WalktheChat/skipper-aliyunoss",
   "devDependencies": {
     "skipper-adapter-tests": "~1.5.8"
   },
   "dependencies": {
+    "ali-oss": "^4.10.1",
+    "aliyun-oss-upload-stream": "^1.3.0",
+    "aliyun-sdk": "^1.10.12",
     "concat-stream": "1.6.0",
     "fs-extra": "0.30.0",
     "knox": "0.8.10",
