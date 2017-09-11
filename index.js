@@ -154,6 +154,7 @@ module.exports = function SkipperS3(globalOpts) {
       console.log(JSON.stringify(__newFile.fd));
       co(store.putStream(__newFile.fd, __newFile))
         .then(function (result) {
+          __newFile.size = result.size;
           __newFile.extra = result;
           __newFile.byteCount = result.size;
           receiver__.emit('writefile', __newFile);
