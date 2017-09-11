@@ -9,9 +9,6 @@ var concat = require('concat-stream');
 var _ = require('lodash');
 _.defaultsDeep = require('merge-defaults');
 var oss = require('ali-oss');
-var knox = require('knox');
-var S3MultipartUpload = require('knox-mpu-alt');
-var S3Lister = require('s3-lister');
 var mime = require('mime');
 var co = require('co');
 
