@@ -9,7 +9,7 @@ Aliyun OSS adapter for receiving [upstreams](https://github.com/balderdashy/skip
 ## Installation
 
 ```
-$ npm install skipper-s3 --save
+$ npm install @walkthechat/skipper-aliyunoss --save
 ```
 
 Also make sure you have skipper itself [installed as your body parser](http://beta.sailsjs.org/#/documentation/concepts/Middleware?q=adding-or-overriding-http-middleware).  This is the default configuration in [Sails](https://github.com/balderdashy/sails) as of v0.10.
