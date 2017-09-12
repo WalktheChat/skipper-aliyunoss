@@ -1,4 +1,4 @@
-# [<img title="skipper-s3 - S3 adapter for Skipper" src="http://i.imgur.com/P6gptnI.png" width="200px" alt="skipper emblem - face of a ship's captain"/>](https://github.com/balderdashy/skipper-s3) S3 Blob Adapter
+# [<img title="skipper-s3 - S3 adapter for Skipper" src="http://i.imgur.com/P6gptnI.png" width="200px" alt="skipper emblem - face of a ship's captain"/>](https://github.com/balderdashy/skipper-s3) Aliyun OSS Blob Adapter
 
 [![NPM version](https://badge.fury.io/js/skipper-s3.png)](http://badge.fury.io/js/skipper-s3) &nbsp; &nbsp;
 [![Build Status](https://travis-ci.org/balderdashy/skipper-s3.svg?branch=master)](https://travis-ci.org/balderdashy/skipper-s3)
