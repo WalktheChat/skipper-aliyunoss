@@ -29,7 +29,8 @@ module.exports = function SkipperS3(globalOpts) {
         accessKeyId: globalOpts.key,
         accessKeySecret: globalOpts.secret,
         bucket: globalOpts.bucket,
-        region: globalOpts.region || undefined
+        region: globalOpts.region || undefined,
+        secure: true
       });
 
       // Build a noop transform stream that will pump the S3 output through
@@ -80,7 +81,8 @@ module.exports = function SkipperS3(globalOpts) {
         accessKeyId: globalOpts.key,
         accessKeySecret: globalOpts.secret,
         bucket: globalOpts.bucket,
-        region: globalOpts.region || undefined
+        region: globalOpts.region || undefined,
+        secure: true
       });
 
       co(store.delete(fd))
@@ -103,7 +105,8 @@ module.exports = function SkipperS3(globalOpts) {
         accessKeyId: globalOpts.key,
         accessKeySecret: globalOpts.secret,
         bucket: globalOpts.bucket,
-        region: globalOpts.region || undefined
+        region: globalOpts.region || undefined,
+        secure: true
       });
 
       // Strip leading slash from dirname to form prefix
@@ -153,7 +156,8 @@ module.exports = function SkipperS3(globalOpts) {
         accessKeyId: options.key,
         accessKeySecret: options.secret,
         bucket: options.bucket,
-        region: globalOpts.region || undefined
+        region: globalOpts.region || undefined,
+        secure: true
       });
 
       var mimeType = headers['content-type'] || mime.lookup(__newFile.fd);
